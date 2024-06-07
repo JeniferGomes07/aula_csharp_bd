@@ -1,52 +1,40 @@
-﻿using aula_csharp_bd.db;
+using Microsoft.AspNetCore.Mvc;
 
-using System.Linq;
+var builder = WebApplication.CreateBuilder(args);
 
-// using (var db = new DbLivrariaContext()) {
-//     foreach (var autor in db.TbAutor.OrderBy(a => a.Nome)){
-//         Console.WriteLine($"O autor {autor.Nome} é do {autor.Pais}");
-//     }
-// }
+builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();
 
-/* using (var db = new DbLivrariaContext()) {
-    foreach (var autor in db.TbAutor.Where(a => a.Nome.Contains("M"))){
-        Console.WriteLine($"O autor {autor.Nome} é do {autor.Pais}");
-    }
-} */
+var app = builder.Build();
 
-// using (var db = new DbLivrariaContext()) 
-// {
-//     var autor = db.TbAutor.Find(2);
+app.UseSwagger();
+app.UseSwaggerUI();
 
-//     if(autor !=null){
-//         Console.WriteLine($"O autor é {autor.Nome}");
-//     }
-//     else{
-//         Console.WriteLine("Autor não consta no banco");
-//     }
-// }
+app.MapGet("/api/{x}/abc/{y}", ([FromRoute] int x, [FromRoute] string y) =>
+{
+    // return $"Recebidos x={x} e y={y}.";
+    return Results.Ok(
+        new {
+            mensagem = "Dados inseridos com sucesso",
+            x = x,
+            y = y
+        }
+    );
+});
 
-// using (var db = new DbLivrariaContext()) {
-//     var novoAutor = new TbAutor
-//     {
-//         Nome = "Clarice Lispector",
-//         NrFone = "11912341783",
-//         Pais = "Ucrânia"
-//     };
+app.MapPost("/api", ([FromBody] Dados dadosEntrada) => {
+    return $"{dadosEntrada.x} + {dadosEntrada.y} = {dadosEntrada.x+dadosEntrada.y}";
+} );
 
-//     db.TbAutor.Add(novoAutor);
-//     db.SaveChanges();
-// }
+app.MapPut("/api", () => "Resposta ao método PUT");
+app.MapDelete("/api", () => "Resposta ao método DELETE");
+app.MapMethods("/api", new[] { "PATCH" }, () => "Resposta ao método PATCH");
 
-using (var db = new DbLivrariaContext()) {
-    var autor = db.TbAutor.SingleOrDefault(a => a.IdAutor == 6);
+app.Run();
 
-    if(autor != null)
-    {
-        autor.Pais = "Brasil";
-        db.SaveChanges();
-    }
-    else{
-        Console.WriteLine("Autor não identificado");
-    }
+public class Dados
+{
+    public int x {get; set;}
+    public int y {get; set;}
+    
 }
